@@ -37,12 +37,12 @@ resource "aws_route_table" "ventura-RT" {
   }
 }
 
-resource "aws_route_table_association" "subnet_NAT-ALB" {
-  subnet_id      = aws_subnet.ventura-Subnet["${var.Name}-NAT-ALB-Subnet-1"].id
+resource "aws_route_table_association" "RT_for_NAT-ALB" {
+  subnet_id      = aws_subnet.ventura-Subnet["Ventura-Prod-NAT-ALB-Subnet-1"].id
   route_table_id = aws_route_table.ventura-RT.id
 }
 
-resource "aws_route_table_association" "subnet_ALB" {
-  subnet_id      = aws_subnet.ventura-Subnet["${var.Name}-ALB-Subnet-2"].id
+resource "aws_route_table_association" "RT_for_ALB" {
+  subnet_id      = aws_subnet.ventura-Subnet["Ventura-Prod-ALB-Subnet-2"].id
   route_table_id = aws_route_table.ventura-RT.id
 }
