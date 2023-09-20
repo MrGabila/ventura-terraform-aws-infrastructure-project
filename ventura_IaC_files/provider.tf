@@ -14,7 +14,6 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Env = "Ventura-Prod"
       Test = "test"
     }
   }
