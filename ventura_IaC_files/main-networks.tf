@@ -2,7 +2,7 @@ resource "aws_vpc" "ventura-VPC" {
   cidr_block       = var.vpc_cidr_block
   #instance_tenancy = var.instance_tenancy
   tags = {
-    Name = "Ventura-Prod-VPC"
+    Name = "${var.Name}-VPC"
   }
 }
 
