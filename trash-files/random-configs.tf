@@ -111,3 +111,8 @@ resource "aws_subnet" "Ventura-Prod-DB-Subnet-2" {
     Name = "Ventura-Prod-DB-Subnet-2"
   }
 }
+
+resource "aws_route_table_association" "subnet_ALB" {
+  subnet_id      = aws_subnet.Ventura-Prod-ALB-Subnet-2.id
+  route_table_id = aws_route_table.ventura-RT.id
+}

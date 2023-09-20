@@ -18,33 +18,31 @@ resource "aws_subnet" "ventura-Subnet" {
 }
 
 
-resource "aws_internet_gateway" "Prod_IGW" {
+resource "aws_internet_gateway" "ventura-IGW" {
   vpc_id = aws_vpc.ventura-VPC.id
-
   tags = {
-    Name = "Prod_IGW"
+    Name = "${var.Name}-IGW"
   }
 }
 
-resource "aws_route_table" "Prod_RTB" {
+resource "aws_route_table" "ventura-RT" {
   vpc_id = aws_vpc.ventura-VPC.id
-
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.Prod_IGW.id
+    gateway_id = aws_internet_gateway.ventura-IGW.id
   }
 
   tags = {
-    Name = "Prod_RTB"
+    Name = "${var.Name}-RT"
   }
 }
 
-resource "aws_route_table_association" "subnet_1" {
-  subnet_id      = aws_subnet.Ventura-Prod-NAT-ALB-Subnet-1.id
-  route_table_id = aws_route_table.Prod_RTB.id
+resource "aws_route_table_association" "subnet_NAT-ALB" {
+  subnet_id      = aws_subnet.ventura-Subnet["${var.Name}-NAT-ALB-Subnet-1"].id
+  route_table_id = aws_route_table.ventura-RT.id
 }
 
-resource "aws_route_table_association" "subnet_2" {
-  subnet_id      = aws_subnet.Ventura-Prod-ALB-Subnet-2.id
-  route_table_id = aws_route_table.Prod_RTB.id
+resource "aws_route_table_association" "subnet_ALB" {
+  subnet_id      = aws_subnet.ventura-Subnet["${var.Name}-ALB-Subnet-2"].id
+  route_table_id = aws_route_table.ventura-RT.id
 }
