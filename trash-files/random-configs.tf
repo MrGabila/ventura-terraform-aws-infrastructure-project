@@ -116,3 +116,38 @@ resource "aws_route_table_association" "subnet_ALB" {
   subnet_id      = aws_subnet.Ventura-Prod-ALB-Subnet-2.id
   route_table_id = aws_route_table.ventura-RT.id
 }
+
+# Retrieve the Subnet Ids 
+locals { 
+  web-subnets = [aws_subnet.Web-Subnets["Ventura-Prod-Web-Subnet-1"].id, aws_subnet.Web-Subnets["Ventura-Prod-Web-Subnet-2"].id]
+  app-subnets = [aws_subnet.App-Subnets["Ventura-Prod-App-Subnet-1"].id, aws_subnet.App-Subnets["Ventura-Prod-App-Subnet-2"].id]
+  db-subnets = [aws_subnet.db-Subnets["Ventura-Prod-DB-Subnet-1"].id, aws_subnet.db-Subnets["Ventura-Prod-DB-Subnet-2"].id]
+}
+
+# Create the Web Servers
+resource "aws_instance" "web-servers" {
+    count = var.prod-server-count
+    ami = data.aws_ami.CentOS7
+    instance_type = var.instance_type
+    subnet_id     = element(values(local.web-subnets), count.index % length(local.web-subnets))
+    
+    tags {
+        tags = var.server-tags
+        Name = "${var.Name}-web-${count.index}"
+    }
+}
+
+# Create the App Servers
+resource "aws_instance" "app-servers" {
+    count = var.prod-server-count
+    ami = data.aws_ami.CentOS7
+    instance_type = var.instance_type
+    subnet_id     = element(values(local.app-subnets), count.index % length(local.app-subnets))
+    root_block_device {
+      volume_size = 250
+    }
+    tags {
+        tags = var.server-tags
+        Name = "${var.Name}-app-${count.index}"
+    }
+}
