@@ -1,16 +1,15 @@
 data "aws_ami" "CentOS7" {
-  executable_users = ["self"]
-  most_recent      = true
+  most_recent = true
 
   filter {
     name   = "image-id"
     values = ["ami-002070d43b0a4f171"]
   }
 
-  filter {
-    name   = "owner-alias"
-    values = ["aws-marketplace"]
-  }
+  # filter {
+  #   name   = "owner-alias"
+  #   values = ["aws-marketplace"]
+  # }
 }
 
 variable "Name" {
@@ -103,24 +102,26 @@ variable "db_subnet_configs" {
 }
 
 variable "instance_type" {
-  type = string
-  dedefault = "t2.medium" 
+  type    = string
+  default = "t2.medium"
 }
 
 variable "server-count" {
-  type = number
-  default = 4
+  type    = number
+  default = 2
 }
 
 variable "server-tags" {
-  type = map(any)
+  description = "tags to be added to all instances"
+  type        = map(any)
   default = {
-    application-id = "dmt468"
-    environment = "prod"
-    budget-code = "cost-prod" 
-    region = "us-east-1"
-    data-classification = "pii"
+    Name = "Ventura-Prod-instance"
+    application-id            = "dmt468"
+    environment               = "prod"
+    budget-code               = "cost-prod"
+    region                    = "us-east-1"
+    data-classification       = "pii"
     compliance-classification = "nist"
-    project-name = "ventura-project"
+    project-name              = "ventura-project"
   }
 }
