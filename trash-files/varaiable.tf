@@ -17,21 +17,9 @@ variable "Name" {
   default = "Ventura-Prod"
 }
 
-variable "vpc_cidr_block" {
-  type    = string
-  default = "10.0.0.0/16"
-}
 
-variable "instance_tenancy" {
-  description = "Used in Env with regulatory compliance and restrictions. Ensures the physical hardwares running your instances is reserved for your account alone"
-  default     = "dedicated"
-}
 
-variable "nova-key" {
-  type      = string
-  default   = "Novirginia-region"
-  sensitive = true
-}
+
 
 variable "ALB_subnet_configs" {
   type = map(object({
@@ -101,15 +89,7 @@ variable "db_subnet_configs" {
   }
 }
 
-variable "instance_type" {
-  type    = string
-  default = "t2.medium"
-}
 
-variable "server-count" {
-  type    = number
-  default = 2
-}
 
 variable "server-tags" {
   description = "tags to be added to all instances"
