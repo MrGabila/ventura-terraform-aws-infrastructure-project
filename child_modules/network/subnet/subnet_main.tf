@@ -11,7 +11,7 @@ resource "aws_subnet" "subnets" {
   }
 }
 
-#################### INPUT VARIABLES ##########################
+#################### INPUT VARIABLES ########################
 variable "vpc_id" {}
 
 variable "subnet_configs" {
@@ -69,4 +69,8 @@ variable "subnet_configs" {
 #################### OUTPUT VARIABLES ##########################
 output "subnet_ids" {
   value = aws_subnet.subnets[*].id
+}
+
+output "subnet_names" {
+  value = aws_subnet.subnets[*].tags["Name"]
 }

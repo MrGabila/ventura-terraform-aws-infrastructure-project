@@ -6,6 +6,7 @@ resource "aws_route_table" "public" {
     cidr_block = "0.0.0.0/0"
     gateway_id = var.internet_gateway_id
   }
+  tags = {Name = "${replace(var.subnet_names[count.index], "Subnet", "RT")}"}
 }
 
 resource "aws_route_table" "private" {
@@ -15,6 +16,7 @@ resource "aws_route_table" "private" {
     cidr_block = "0.0.0.0/0"
     gateway_id = var.nat_gateway_ids[count.index % 2]
   }
+  tags = {Name = "${replace(var.subnet_names[count.index + 4], "Subnet", "RT")}"}
   
 }
 
@@ -37,6 +39,7 @@ variable "vpc_id" {}
 variable "internet_gateway_id" {}
 variable "nat_gateway_ids" {type = list}
 variable "subnet_ids" {type = list}
+variable "subnet_names" {type = list}
 
 #################### OUTPUT VARIABLES ##########################
 output "public_route_table_ids" {

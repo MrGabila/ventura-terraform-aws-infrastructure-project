@@ -1,6 +1,7 @@
-##################################################################################################
-##### MODULES  #######
+#################### INPUT VARIABLES ##########################
 
+
+#################### RESOURCE MODULES ##########################
 module "vpc" {
   source     = "../child_modules/network/vpc"
   name_prefix = "Prod"
@@ -27,6 +28,7 @@ module "route-tables" {
   internet_gateway_id = module.vpc.igw_id
   nat_gateway_ids     = [module.nat.natgw_zone1_id, module.nat.natgw_zone2_id]
   subnet_ids          = module.subnets.subnet_ids
+  subnet_names = module.subnets.subnet_names
 
   depends_on = [module.vpc, module.nat]
 }

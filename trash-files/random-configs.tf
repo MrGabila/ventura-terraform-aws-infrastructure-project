@@ -1,5 +1,3 @@
-tags = {Name = "${name_prefix}-private-RT-${count.index}"}
-  tags = {Name = "${name_prefix}-public-RT-${count.index}"}
 
 
 variable "subnet_cidrs" {
@@ -96,29 +94,6 @@ resource "aws_subnet" "Ventura-Prod-App-Subnet-2" {
   tags = {
     Name = "Ventura-Prod-App-Subnet-2"
   }
-}
-
-resource "aws_subnet" "Ventura-Prod-DB-Subnet-1" {
-  vpc_id     = aws_vpc.ventura-VPC.id
-  cidr_block = "10.0.25.0/27" # 27 Ips
-  availability_zone = var.availability_zone[0]
-  tags = {
-    Name = "Ventura-Prod-DB-Subnet-1"
-  }
-}
-
-resource "aws_subnet" "Ventura-Prod-DB-Subnet-2" {
-  vpc_id     = aws_vpc.ventura-VPC.id
-  cidr_block = "10.0.25.0/27" # 27 IPs
-  availability_zone = var.availability_zone[1]
-  tags = {
-    Name = "Ventura-Prod-DB-Subnet-2"
-  }
-}
-
-resource "aws_route_table_association" "subnet_ALB" {
-  subnet_id      = aws_subnet.Ventura-Prod-ALB-Subnet-2.id
-  route_table_id = aws_route_table.ventura-RT.id
 }
 
 # Retrieve the Subnet Ids 
