@@ -53,7 +53,6 @@ resource "aws_lb_target_group" "frontend_lb_tg" {
   }
 }
 
-
 #################### INPUT VARIABLES ##########################
 variable "sg_port_to_source_map" {
   description = "Map of ports to their respective sources"
@@ -68,7 +67,11 @@ output "frontend_lb_sg_id" {
   value = aws_security_group.frontend_lb_sg.id
 }
 
-output "frontend_alb_dns_name" {
+output "frontend_TG_arn" {
+  value = aws_lb_target_group.frontend_lb_tg.arn
+}
+
+output "frontend_lb_dns_name" {
   value = aws_lb.frontend_lb.dns_name
 }
 

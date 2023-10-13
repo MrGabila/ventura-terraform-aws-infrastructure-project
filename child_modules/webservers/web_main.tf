@@ -12,7 +12,6 @@ resource "aws_security_group" "webservers_sg" {
     security_groups = [each.value]
   }
 }
-
   egress {
     from_port        = 0
     to_port          = 0
@@ -23,30 +22,31 @@ resource "aws_security_group" "webservers_sg" {
 }
 
 # Define Your Launch Configuration for the autoscaling group
-resource "aws_launch_configuration" "web-template" {
-  name_prefix                 = "${var.name_prefix}-web-"
-  image_id                    = data.aws_ami.CentOS7.image_id
+resource "aws_launch_configuration" "template" {
+  name_prefix                 = "${var.name_prefix}-web-LC"
+  image_id                    = var.AMI
   instance_type               = var.instance_type
-  key_name                    = var.nova-key
-  security_groups             = [aws_security_group.web-SG.id]
+  key_name                    = var.key_name
+  security_groups             = [aws_security_group.webservers_sg.id]
   user_data                   = "./web-automation.sh"
   associate_public_ip_address = true
+  iam_instance_profile = var.iam_instance_profile
 }
 
 # Create Auto Scaling Group: specify the desired number of instances, availability zones, and other ASG settings
 resource "aws_autoscaling_group" "example" {
-  name_prefix               = "${var.name_prefix}-web-"
-  launch_configuration      = aws_launch_configuration.web-template.name
+  name_prefix               = "${var.name_prefix}-web-ASG"
+  launch_configuration      = aws_launch_configuration.template.name
   min_size                  = 1
-  max_size                  = var.server-count
-  desired_capacity          = var.server-count
-  vpc_zone_identifier       = [aws_subnet.Web-Subnets["Ventura-Prod-Web-Subnet-1"].id, aws_subnet.Web-Subnets["Ventura-Prod-Web-Subnet-2"].id] # Specify your subnets
+  max_size                  = 5
+  desired_capacity          = var.desired_capacity
+  vpc_zone_identifier       = var.subnet_ids # web subnets
   health_check_type         = "EC2"
   health_check_grace_period = 300
-  target_group_arns         = [aws_lb_target_group.web-TG.arn]
+  target_group_arns         = var.target_group_arns
 
   dynamic "tag" {
-    for_each = var.server-tags
+    for_each = var.tags
 
     content {
       key                 = tag.key
@@ -63,37 +63,14 @@ variable "sg_port_to_source_map" {
   default     = {}
 }
 variable "name_prefix" {}
+variable "AMI" {}
 variable "subnet_ids" {type = list}
-
-variable "nova-key" {
-  type      = string
-  default   = "Novirginia-region"
-  sensitive = true
-}
-variable "instance_type" {
-  type    = string
-  default = "t2.medium"
-}
-
-variable "server-count" {
-  type    = number
-  default = 2
-}
-
-variable "server-tags" {
-  description = "tags to be added to all instances"
-  type        = map(any)
-  default = {
-    Name = "Ventura-Prod-instance"
-    application-id            = "dmt468"
-    environment               = "prod"
-    budget-code               = "cost-prod"
-    region                    = "us-east-1"
-    data-classification       = "pii"
-    compliance-classification = "nist"
-    project-name              = "ventura-project"
-  }
-}
+variable "key_name" {}
+variable "instance_type" {default = "t2.micro"}
+variable "tags" {}
+variable "desired_capacity" {}
+variable "target_group_arns" {type = list}
+variable "iam_instance_profile" {}
 
 #################### OUTPUT VARIABLES ##########################
 output "webservers_sg_id" {

@@ -66,7 +66,9 @@ variable "vpc_id" {}
 output "backend_lb_sg_id" {
   value = aws_security_group.backend_lb_sg.id
 }
-
+output "backend_TG_arn" {
+  value = aws_lb_target_group.backend_lb_tg.arn
+}
 output "backend_lb_dns_name" {
   value = aws_lb.backend_lb.dns_name
 }

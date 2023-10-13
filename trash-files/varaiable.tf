@@ -88,20 +88,3 @@ variable "db_subnet_configs" {
     }
   }
 }
-
-
-
-variable "server-tags" {
-  description = "tags to be added to all instances"
-  type        = map(any)
-  default = {
-    Name = "Ventura-Prod-instance"
-    application-id            = "dmt468"
-    environment               = "prod"
-    budget-code               = "cost-prod"
-    region                    = "us-east-1"
-    data-classification       = "pii"
-    compliance-classification = "nist"
-    project-name              = "ventura-project"
-  }
-}
