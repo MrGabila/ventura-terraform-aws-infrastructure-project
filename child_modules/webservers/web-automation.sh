@@ -1,9 +1,9 @@
 #!/bin/bash
 # Install and Setup Apache2 and PHP Version 7
+sudo apt-get update
 sudo apt-get -y install apache2
 sudo locale-gen en_US.UTF-8
 export LANG=en_US.UTF-8
-sudo apt-get update 
 sudo apt-get install -y software-properties-common python-software-properties
 sudo LC_ALL=en_US.UTF-8 add-apt-repository -y ppa:ondrej/php
 sudo apt-get update 
@@ -27,7 +27,7 @@ sudo apt-get install awscli -y
 # Copy the Apache2 Proxy Config File From S3
 # UPDATE S3 BUCKET/OBJECT NAME
 sudo rm /etc/apache2/sites-available/000-default.conf
-sudo aws s3 cp s3://000-default.conf /etc/apache2/sites-available/
+sudo aws s3 cp s3://ventura-prod-bucket-use1-2023/000-default.conf /etc/apache2/sites-available/
 
 # Enable Apache2 Reverse Proxy
 sudo a2enmod proxy 

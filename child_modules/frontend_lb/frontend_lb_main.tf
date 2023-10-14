@@ -2,24 +2,25 @@
 resource "aws_security_group" "frontend_lb_sg" {
   name        = "frontend-LB-SG"
   description = "Frontend-LB-Security-Group"
+  vpc_id = var.vpc_id
 
     dynamic "ingress" {
         for_each = var.sg_port_to_source_map
         content {
-            from_port   = each.key
-            to_port     = each.key
+            from_port   = ingress.key
+            to_port     = ingress.key
             protocol    = "tcp"
-            cidr_blocks = [each.value]
+            cidr_blocks = [ingress.value]
             }
     }
 }
 
 resource "aws_lb" "frontend_lb" {
-  name               = "Prod-Frontend-LB"
+  name               = "${var.name_prefix}-backend-LB"
   internal           = false
   load_balancer_type = "application"
   subnets            = [var.subnet_ids[0],var.subnet_ids[1]] #nat-alb-subnets
-  security_groups    = [aws_security_group.frontend_lb_sg]
+  security_groups    = [aws_security_group.frontend_lb_sg.id]
 }
 
 resource "aws_lb_listener" "frontend_lb_listener" {
@@ -54,13 +55,14 @@ resource "aws_lb_target_group" "frontend_lb_tg" {
 }
 
 #################### INPUT VARIABLES ##########################
+variable "name_prefix" {}
+variable "vpc_id" {}
 variable "sg_port_to_source_map" {
   description = "Map of ports to their respective sources"
   type        = map(any)
   default     = {}
 }
 variable "subnet_ids" {}
-variable "vpc_id" {}
 
 #################### OUTPUT VARIABLES ##########################
 output "frontend_lb_sg_id" {

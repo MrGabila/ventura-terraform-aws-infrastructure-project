@@ -2,14 +2,15 @@
 resource "aws_security_group" "webservers_sg" {
   name        = "webservers-SG"
   description = "Webservers Security Group"
+  vpc_id = var.vpc_id
 
   dynamic "ingress" {
   for_each = var.sg_port_to_source_map
   content {
-    from_port   = each.key
-    to_port     = each.key
+    from_port   = ingress.key
+    to_port     = ingress.key
     protocol    = "tcp"
-    security_groups = [each.value]
+    security_groups = [ingress.value]
   }
 }
   egress {
@@ -31,6 +32,7 @@ resource "aws_launch_configuration" "template" {
   user_data                   = "./web-automation.sh"
   associate_public_ip_address = true
   iam_instance_profile = var.iam_instance_profile
+
 }
 
 # Create Auto Scaling Group: specify the desired number of instances, availability zones, and other ASG settings
@@ -57,6 +59,7 @@ resource "aws_autoscaling_group" "example" {
 }
 
 #################### INPUT VARIABLES ##########################
+variable "vpc_id" {}
 variable "sg_port_to_source_map" {
   description = "Map of ports to their respective sources"
   type        = map(any)

@@ -2,14 +2,15 @@
 resource "aws_security_group" "database_sg" {
   name        = "database-SG"
   description = "Database-Security-Group"
+  vpc_id = var.vpc_id
 
     dynamic "ingress" {
         for_each = var.sg_port_to_source_map
         content {
-            from_port   = each.key
-            to_port     = each.key
+            from_port   = ingress.key
+            to_port     = ingress.key
             protocol    = "tcp"
-            cidr_blocks = [each.value]
+            security_groups = [ingress.value]
             }
     }
     egress {
@@ -28,9 +29,9 @@ resource "aws_db_subnet_group" "db_subnet_grp" {
 
 resource "aws_db_instance" "database_instance" {
   #settings
-  identifier = "${var.name_prefix}-RDS"
+  identifier = "${var.name_prefix}-rds"
   engine               = "mysql"
-  engine_version       = "latest"
+  engine_version       = "5.7"
   instance_class       = var.instance_class
   username             = "admin"
   password             = "admin12345"
@@ -44,7 +45,7 @@ resource "aws_db_instance" "database_instance" {
   #connectivity
   multi_az                    = true
   db_subnet_group_name = aws_db_subnet_group.db_subnet_grp.name
-  vpc_security_group_ids = [aws_security_group.database_sg]
+  vpc_security_group_ids = [aws_security_group.database_sg.id]
 
   #other
   db_name               = var.database_name
@@ -58,6 +59,7 @@ resource "aws_db_instance" "database_instance" {
 }
 
 #################### INPUT VARIABLES ##########################
+variable "vpc_id" {}
 variable "sg_port_to_source_map" {
   description = "Map of ports to their respective sources"
   type        = map(any)

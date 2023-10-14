@@ -1,11 +1,7 @@
 #################### RESOURCES ##########################
 resource "aws_s3_bucket" "example" {
   bucket = var.bucket_name
-}
-
-resource "aws_s3_bucket_acl" "name" {
-  bucket = aws_s3_bucket.example.id
-  acl = "private"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "versioning_example" {
@@ -33,34 +29,20 @@ resource "aws_s3_bucket_public_access_block" "bpa_example" {
   restrict_public_buckets = var.block_public_access
 }
 
-resource "aws_iam_role" "ec2_role" {
-  name = "EC2-Role-for-s3"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "name" {
-  role = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-}
-
 # Upload DB Config files
 resource "aws_s3_object" "db_config" {
   for_each = var.local_files
   bucket = aws_s3_bucket.example.id
-  key    = each.value
-  source = file(each.value)
+  key    = each.key
+  content = each.value
+}
+#ventura-prod_bucket_use1_2023
+resource "null_resource" "upload_to_s3" {
+  provisioner "local-exec" {
+    command = "aws s3 cp ../child_modules/local_file_db-configs/VenturaMailingApp.php s3://${var.bucket_name}/VenturaMailingApp.php"
+  }
+
+  depends_on = [aws_s3_bucket.example] # Make sure the S3 bucket is created first
 }
 
 #################### INPUT VARIABLES ##########################
@@ -71,12 +53,9 @@ variable "bucket_name" {
 variable "region" {}
 variable "versioning_status" {default = "Disabled"}
 variable "block_public_access" {default = true}
-variable "local_files" {type = list}
+variable "local_files" {type = map}
 
 #################### OUTPUT VARIABLES ##########################
 output "bucket_id" {
   value = aws_s3_bucket.example.id
-}
-output "ec2_role_s3_readonly" {
-  value = aws_iam_role.ec2_role.arn
 }

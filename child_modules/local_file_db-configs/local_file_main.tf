@@ -24,15 +24,20 @@ resource "local_file" "default-conf" {
   filename = "./000-default.conf"
 }
 
-data "local_file" "php-file" {
-  filename = "./VenturaMailingApp.php"
-}
+# data "local_file" "php-file" {
+#   filename = "~/OneDrive/Desktop/DevOps/Repositories/ventura_Prod-Env_infrastructure_project/child_modules/local_file_db-configs/VenturaMailingApp.php"
+# }
 
 #################### INPUT VARIABLES ##########################
 variable "db_endpoint" {}
 variable "initial_database" {}
 variable "backend_lb_dns_name" {}
+
 #################### OUTPUT VARIABLES ##########################
-output "files" {
-  value = [local_file.dbinfo.filename, local_file.default-conf.filename, data.local_file.php-file.filename]
+output "upload_to_s3" {
+  value = {
+    "dbinfo.inc"      = local_file.dbinfo.content
+    "000-default.conf" = local_file.default-conf.content
+   # "VenturaMailingApp.php"     = data.local_file.php-file.content
+  }
 }

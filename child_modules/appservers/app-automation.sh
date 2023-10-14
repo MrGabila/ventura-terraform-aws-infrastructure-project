@@ -34,9 +34,9 @@ mkdir /var/www/inc
 
 #10. Create a new file in the ``inc`` directory named ``dbinfo.inc``
 # UPDATE S3 BUCKET/OBJECT NAME
-aws s3 cp s3://dbinfo.inc /var/www/inc
+aws s3 cp s3://ventura-prod-bucket-use1-2023/dbinfo.inc /var/www/inc
 
 #11. Create a new file in the ``html`` directory named VenturaMailingApp.php, 
 # UPDATE S3 BUCKET/OBJECT NAME
-aws s3 cp s3://VenturaMailingApp.php /var/www/html
+aws s3 cp s3://ventura-prod-bucket-use1-2023/VenturaMailingApp.php /var/www/html
 

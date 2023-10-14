@@ -2,14 +2,16 @@
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-host-SG"
   description = "Bastion Host Security Group"
+  vpc_id = var.vpc_id
 
   dynamic "ingress" {
     for_each = var.sg_port_to_source_map
+    iterator = ingress
         content {
-            from_port   = each.key
-            to_port     = each.key
+            from_port   = ingress.key
+            to_port     = ingress.key
             protocol    = "tcp"
-            security_groups = [each.value]
+            cidr_blocks = [ingress.value]
         }
     }
    egress {
@@ -36,6 +38,7 @@ resource "aws_instance" "bastion_host" {
 
 
 #################### INPUT VARIABLES ##########################
+variable "vpc_id" {}
 variable "sg_port_to_source_map" {
   description = "Map of ports to their respective sources"
   type        = map(any)
