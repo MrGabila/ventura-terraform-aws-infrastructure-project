@@ -16,7 +16,7 @@ resource "aws_security_group" "frontend_lb_sg" {
 }
 
 resource "aws_lb" "frontend_lb" {
-  name               = "${var.name_prefix}-backend-LB"
+  name               = "${var.name_prefix}-frontend-LB"
   internal           = false
   load_balancer_type = "application"
   subnets            = [var.subnet_ids[0],var.subnet_ids[1]] #nat-alb-subnets
