@@ -12,6 +12,7 @@ resource "aws_s3_bucket_versioning" "versioning_example" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "sse-example" {
+  count = "${var.server_side_encryption ? 1 : 0}"
   bucket = aws_s3_bucket.example.id
   rule {
     apply_server_side_encryption_by_default {
@@ -29,14 +30,13 @@ resource "aws_s3_bucket_public_access_block" "bpa_example" {
   restrict_public_buckets = var.block_public_access
 }
 
-
-
 #################### INPUT VARIABLES ##########################
 variable "bucket_name" {
   description = "unique identifier for the s3 bucket, must be lowercase"
   type = string
 }
 variable "region" {}
+variable "server_side_encryption" {type = bool}
 variable "versioning_status" {default = "Disabled"}
 variable "block_public_access" {default = true}
 

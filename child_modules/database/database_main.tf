@@ -1,6 +1,6 @@
 #################### RESOURCES ##########################
 resource "aws_security_group" "database_sg" {
-  name        = "database-SG"
+  name        = "${var.name_prefix}-database-SG"
   description = "Database-Security-Group"
   vpc_id = var.vpc_id
 

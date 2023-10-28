@@ -1,6 +1,6 @@
 #################### RESOURCES ##########################
 resource "aws_security_group" "frontend_lb_sg" {
-  name        = "frontend-LB-SG"
+  name        = "${var.name_prefix}-frontend-lb-SG"
   description = "Frontend-LB-Security-Group"
   vpc_id = var.vpc_id
 
@@ -39,7 +39,7 @@ resource "aws_lb_listener" "frontend_lb_listener" {
 }
 
 resource "aws_lb_target_group" "frontend_lb_tg" {
-  name        = "Frontend-LB-HTTP-TG"
+  name        = "${var.name_prefix}-frontend-HTTP-TG"
   port        = 80
   protocol    = "HTTP"
   target_type = "instance"

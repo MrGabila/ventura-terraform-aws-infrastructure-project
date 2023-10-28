@@ -1,26 +1,10 @@
 #################### RESOURCES ##########################
-resource "aws_security_group" "backend_lb_sg" {
-  name        = "backend-LB-SG"
-  description = "Backend-LB-Security-Group"
-  vpc_id = var.vpc_id
-
-  dynamic "ingress" {
-  for_each = var.sg_port_to_source_map
-  content {
-    from_port   = ingress.key
-    to_port     = ingress.key
-    protocol    = "tcp"
-    security_groups = [ingress.value]
-    }
-}
-}
-
 resource "aws_lb" "backend_lb" {
   name               = "${var.name_prefix}-backend-LB"
   internal           = false
   load_balancer_type = "application"
   subnets            = [var.subnet_ids[2], var.subnet_ids[3]] #web-subnets
-  security_groups    = [aws_security_group.backend_lb_sg.id]
+  security_groups    = [var.sg_id]
 }
 
 resource "aws_lb_listener" "backend_lb_listener" {
@@ -39,7 +23,7 @@ resource "aws_lb_listener" "backend_lb_listener" {
 }
 
 resource "aws_lb_target_group" "backend_lb_tg" {
-  name        = "Backend-LB-HTTP-TG"
+  name        = "${var.name_prefix}-backend-HTTP-TG"
   port        = 80
   protocol    = "HTTP"
   target_type = "instance"
@@ -57,16 +41,10 @@ resource "aws_lb_target_group" "backend_lb_tg" {
 #################### INPUT VARIABLES ##########################
 variable "name_prefix" {}
 variable "vpc_id" {}
-variable "sg_port_to_source_map" {
-  type        = map(any)
-  default     = {}
-}
+variable "sg_id" {}
 variable "subnet_ids" {}
 
 #################### OUTPUT VARIABLES ##########################
-output "backend_lb_sg_id" {
-  value = aws_security_group.backend_lb_sg.id
-}
 output "backend_TG_arn" {
   value = aws_lb_target_group.backend_lb_tg.arn
 }

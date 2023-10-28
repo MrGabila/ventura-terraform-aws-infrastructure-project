@@ -1,36 +1,12 @@
 #################### RESOURCES ##########################
-resource "aws_security_group" "appservers_sg" {
-  name        = "appservers-SG"
-  description = "Appservers Security Group"
-  vpc_id = var.vpc_id
-
-  dynamic "ingress" {
-  for_each = var.sg_port_to_source_map
-  content {
-    from_port   = ingress.key
-    to_port     = ingress.key
-    protocol    = "tcp"
-    security_groups = [ingress.value]
-    }
-}
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-}
-
 # Define Your Launch Configuration for the autoscaling group
 resource "aws_launch_configuration" "template" {
   name_prefix                 = "${var.name_prefix}-app-LC"
   image_id                    = var.AMI
   instance_type               = var.instance_type
   key_name                    = var.key_name
-  security_groups             = [aws_security_group.appservers_sg.id]
-  user_data                   = "./app-automation.sh"
+  security_groups             = [var.sg_id]
+  user_data = var.user_data
   associate_public_ip_address = true
   iam_instance_profile = var.iam_instance_profile
 }
@@ -60,11 +36,7 @@ resource "aws_autoscaling_group" "example" {
 
 #################### INPUT VARIABLES ##########################
 variable "vpc_id" {}
-variable "sg_port_to_source_map" {
-  description = "Map of ports to their respective sources"
-  type        = map(any)
-  default     = {}
-}
+variable "sg_id" {}
 variable "name_prefix" {}
 variable "AMI" {}
 variable "subnet_ids" {type = list}
@@ -74,9 +46,6 @@ variable "tags" {}
 variable "desired_capacity" {}
 variable "target_group_arns" {type = list}
 variable "iam_instance_profile" {}
+variable "user_data" {}
 
 #################### OUTPUT VARIABLES ##########################
-output "appservers_sg_id" {
-  value = aws_security_group.appservers_sg.id
-}
-

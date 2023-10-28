@@ -7,6 +7,7 @@ variable "instance_tags" {
   description = "tags to be added to all instances"
   type        = map(any)
   default = {
+    
     application-id            = "dmt468"
     Environment               = "prod"
     budget-code               = "cost-prod"
@@ -25,6 +26,7 @@ variable "nova-key" {
 data "aws_iam_instance_profile" "profile" {
   name = "EC2-Role-for-S3"
 }
+
 #################### RESOURCE MODULES ##########################
 module "vpc" { #Creates VPC, IGW and 8 subnets in 2 AZs(4 tier architecture)
   source      = "../child_modules/network/vpc"
@@ -76,15 +78,31 @@ module "frontend_lb" {
   name_prefix = var.name_prefix
 }
 
+module "backend_lb" {
+  source = "../child_modules/backend_lb"
+  vpc_id      = module.vpc.vpc_id
+  sg_id       = module.sec_groups.backend_lb_sg_id
+  subnet_ids  = module.vpc.subnet_ids
+  name_prefix = var.name_prefix
+}
+
+module "sec_groups" {
+  source            = "../child_modules/network/sec_groups"
+  name_prefix       = var.name_prefix
+  vpc_id            = module.vpc.vpc_id
+  bastion_sg_id     = module.bastion.bastion_sg_id
+  frontend_lb_sg_id = module.frontend_lb.frontend_lb_sg_id
+
+  webserver_ports  = [80, 443]
+  backend_lb_ports = [80, 433]
+  appserver_ports  = [80, 433]
+}
+
 module "webservers" {
-  source = "../child_modules/webservers"
-  #depends_on = [module.s3]
-  vpc_id = module.vpc.vpc_id
-  sg_port_to_source_map = {
-    80  = module.frontend_lb.frontend_lb_sg_id
-    443 = module.frontend_lb.frontend_lb_sg_id
-    22  = module.bastion.bastion_sg_id
-  }
+  source     = "../child_modules/webservers"
+  depends_on = [module.s3]
+  vpc_id     = module.vpc.vpc_id
+  sg_id      = module.sec_groups.webservers_sg_id
 
   name_prefix          = var.name_prefix
   AMI                  = "ami-0261755bbcb8c4a84"                              # Ubuntu 20.04
@@ -94,28 +112,14 @@ module "webservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [module.frontend_lb.frontend_TG_arn]
-}
-
-module "backend_lb" {
-  source = "../child_modules/backend_lb"
-  sg_port_to_source_map = {
-    80  = module.webservers.webservers_sg_id
-    443 = module.webservers.webservers_sg_id
-    22  = module.bastion.bastion_sg_id
-  }
-  vpc_id      = module.vpc.vpc_id
-  subnet_ids  = module.vpc.subnet_ids
-  name_prefix = var.name_prefix
+  user_data = file("./web-automation.sh")
 }
 
 module "appservers" {
-  source = "../child_modules/appservers"
-  vpc_id = module.vpc.vpc_id
-  sg_port_to_source_map = {
-    80  = module.backend_lb.backend_lb_sg_id
-    443 = module.backend_lb.backend_lb_sg_id
-    22  = module.bastion.bastion_sg_id
-  }
+  source     = "../child_modules/appservers"
+  depends_on = [module.s3]
+  vpc_id     = module.vpc.vpc_id
+  sg_id      = module.sec_groups.appservers_sg_id
 
   name_prefix          = var.name_prefix
   AMI                  = "ami-0bb4c991fa89d4b9b"                              # Amazon Linux 2
@@ -125,7 +129,9 @@ module "appservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [module.backend_lb.backend_TG_arn]
+  user_data = file("./app-automation.sh")
 }
+
 
 module "database" {
   source        = "../child_modules/database"
@@ -133,7 +139,7 @@ module "database" {
   name_prefix   = var.name_prefix #must be lowercase
   database_name = "mailingApp"    #must be alpha numeric characters only
   sg_port_to_source_map = {
-    3306 = module.appservers.appservers_sg_id
+    3306 = module.sec_groups.appservers_sg_id
     3306 = module.bastion.bastion_sg_id
   }
   db_subnet_ids  = [module.vpc.subnet_ids[6], module.vpc.subnet_ids[7]]
@@ -149,6 +155,7 @@ module "s3" {
   region              = "us-east-1"
   versioning_status   = "Enabled"
   block_public_access = true
+  server_side_encryption = true
 
   db_endpoint         = module.database.database_endpoint
   initial_database    = module.database.database_name

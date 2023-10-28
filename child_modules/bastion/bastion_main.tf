@@ -1,6 +1,6 @@
 #################### RESOURCES ##########################
 resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-host-SG"
+  name        = "${var.name_prefix}-bastion-SG"
   description = "Bastion Host Security Group"
   vpc_id = var.vpc_id
 
