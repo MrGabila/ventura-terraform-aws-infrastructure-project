@@ -102,3 +102,27 @@ locals {
   app-subnets = [aws_subnet.App-Subnets["Ventura-Prod-App-Subnet-1"].id, aws_subnet.App-Subnets["Ventura-Prod-App-Subnet-2"].id]
   db-subnets = [aws_subnet.db-Subnets["Ventura-Prod-DB-Subnet-1"].id, aws_subnet.db-Subnets["Ventura-Prod-DB-Subnet-2"].id]
 }
+
+locals {
+  common_egress ={
+      description      = "Allow all outbound traffic"
+      security_groups  = []
+      prefix_list_ids  = []
+      self             = false
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+# variable "sg_port_to_source_map" {
+#   description = "Map of ports to their respective sources"
+#   type        = map(any)
+#   default     = {}
+# }
+#   sg_port_to_source_map = {
+#     3306 = module.sec_groups.appservers_sg_id
+#     3306 = module.bastion.bastion_sg_id
+#   }

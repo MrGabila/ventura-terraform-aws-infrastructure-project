@@ -7,7 +7,7 @@ variable "instance_tags" {
   description = "tags to be added to all instances"
   type        = map(any)
   default = {
-    
+
     application-id            = "dmt468"
     Environment               = "prod"
     budget-code               = "cost-prod"
@@ -42,7 +42,7 @@ module "nat" { #Creates 2 NATGW in each public subnet
   depends_on  = [module.vpc]
 }
 
-module "route-tables" { #Creates 8 RTs and associates them with their subnets
+module "route-tables" { #Creates 8 RTs and associates them with each subnet
   source              = "../child_modules/network/route-tables"
   name_prefix         = var.name_prefix
   vpc_id              = module.vpc.vpc_id
@@ -79,7 +79,7 @@ module "frontend_lb" {
 }
 
 module "backend_lb" {
-  source = "../child_modules/backend_lb"
+  source      = "../child_modules/backend_lb"
   vpc_id      = module.vpc.vpc_id
   sg_id       = module.sec_groups.backend_lb_sg_id
   subnet_ids  = module.vpc.subnet_ids
@@ -96,8 +96,36 @@ module "sec_groups" {
   webserver_ports  = [80, 443]
   backend_lb_ports = [80, 433]
   appserver_ports  = [80, 433]
+  database_port    = 3306
 }
 
+module "database" {
+  source        = "../child_modules/database"
+  vpc_id        = module.vpc.vpc_id
+  name_prefix   = var.name_prefix #must be lowercase
+  database_name = "mailingApp"    #must be alpha numeric characters only
+  sg_id         = module.sec_groups.database_sg_id
+  subnet_ids  = [module.vpc.subnet_ids[6], module.vpc.subnet_ids[7]]
+  instance_class = "db.m5.large"
+  instance_tags  = var.instance_tags
+}
+
+module "s3" {
+  source     = "../child_modules/s3"
+  depends_on = [module.database]
+
+  bucket_name            = "${var.name_prefix}-bucket-use1-2023"
+  region                 = "us-east-1"
+  versioning_status      = "Enabled"
+  block_public_access    = true
+  server_side_encryption = true
+
+  db_endpoint         = module.database.database_endpoint
+  initial_database    = module.database.database_name
+  backend_lb_dns_name = module.backend_lb.backend_lb_dns_name
+}
+
+# provision Autoscaling group Instances for the Web tier
 module "webservers" {
   source     = "../child_modules/webservers"
   depends_on = [module.s3]
@@ -112,9 +140,9 @@ module "webservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [module.frontend_lb.frontend_TG_arn]
-  user_data = file("./web-automation.sh")
+  user_data            = file("./web-automation.sh")
 }
-
+# provision Autoscaling group Instances for the App tier
 module "appservers" {
   source     = "../child_modules/appservers"
   depends_on = [module.s3]
@@ -129,39 +157,10 @@ module "appservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [module.backend_lb.backend_TG_arn]
-  user_data = file("./app-automation.sh")
+  user_data            = file("./app-automation.sh")
 }
 
-
-module "database" {
-  source        = "../child_modules/database"
-  vpc_id        = module.vpc.vpc_id
-  name_prefix   = var.name_prefix #must be lowercase
-  database_name = "mailingApp"    #must be alpha numeric characters only
-  sg_port_to_source_map = {
-    3306 = module.sec_groups.appservers_sg_id
-    3306 = module.bastion.bastion_sg_id
-  }
-  db_subnet_ids  = [module.vpc.subnet_ids[6], module.vpc.subnet_ids[7]]
-  instance_class = "db.m5.large"
-  instance_tags  = var.instance_tags
-}
-
-module "s3" {
-  source     = "../child_modules/s3"
-  depends_on = [module.database]
-
-  bucket_name         = "${var.name_prefix}-bucket-use1-2023"
-  region              = "us-east-1"
-  versioning_status   = "Enabled"
-  block_public_access = true
-  server_side_encryption = true
-
-  db_endpoint         = module.database.database_endpoint
-  initial_database    = module.database.database_name
-  backend_lb_dns_name = module.backend_lb.backend_lb_dns_name
-}
-
+#### Output endpoints
 output "frontend_lb_dns_name" {
   value = module.frontend_lb.frontend_lb_dns_name
 }

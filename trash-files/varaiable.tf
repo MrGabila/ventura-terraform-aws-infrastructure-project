@@ -17,10 +17,6 @@ variable "Name" {
   default = "Ventura-Prod"
 }
 
-
-
-
-
 variable "ALB_subnet_configs" {
   type = map(object({
     cidr_block        = string
