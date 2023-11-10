@@ -30,6 +30,12 @@ resource "aws_instance" "bastion_host" {
   associate_public_ip_address = true
   subnet_id             = var.subnet_id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt update -y
+              sudo apt install mysql-server -y
+              sudo hostnamectl set-hostname "ventura-Bastion" --pretty
+            EOF
 
   tags = {
     Name = "${var.name_prefix}-Bastion-Host"

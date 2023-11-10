@@ -59,12 +59,14 @@ module "bastion" { #Creates a host server in the public subnet
   vpc_id = module.vpc.vpc_id
   sg_port_to_source_map = {
     22 = "0.0.0.0/0"
+    3306 = "0.0.0.0/0"
   }
   name_prefix   = var.name_prefix
   key_name      = var.nova-key
   AMI           = "ami-0261755bbcb8c4a84" # Ubuntu 20.04
   instance_type = "t2.micro"
   subnet_id     = module.vpc.subnet_ids[0] #nat-alb-subnet-1
+  # Note in order to login via ssh into the Web and App servers, make sure to use the private IP address
 }
 
 module "frontend_lb" {
