@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo hostnamectl set-hostname "ventura-WebServer" --pretty
+sudo hostnamectl set-hostname "ventura-WebServer"
 # Install and Setup Apache2 and PHP Version 7
 sudo apt-get update
 sudo apt-get -y install apache2

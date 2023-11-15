@@ -1,4 +1,4 @@
-#################### RESOURCES ##########################
+#################################  RESOURCES  ######################################################
 resource "aws_db_subnet_group" "db_subnet_grp" {
   name       = "${var.name_prefix}-db-subnet-grp"
   subnet_ids = var.subnet_ids
@@ -11,7 +11,7 @@ resource "aws_db_instance" "database_instance" {
   engine_version       = "5.7"
   instance_class       = var.instance_class
   username             = "admin"
-  password             = "admin12345"
+  password             = "adminadmin"
 
   #storage
   allocated_storage    = var.allocated_storage
@@ -35,7 +35,7 @@ resource "aws_db_instance" "database_instance" {
   tags = var.instance_tags
 }
 
-#################### INPUT VARIABLES ##########################
+################################  INPUT VARIABLES  #################################################
 variable "vpc_id" {}
 variable "sg_id" {}
 variable "name_prefix" {description = "must be lowercase"}
@@ -45,8 +45,7 @@ variable "instance_class" {}
 variable "instance_tags" {default = null}
 variable "allocated_storage" {default = 30}
 variable "storage_type" {default = "gp3"}
-
-#################### OUTPUT VARIABLES ##########################
+###############################  OUTPUT VARIABLES  #################################################
 output "database_endpoint" {
   value = aws_db_instance.database_instance.endpoint
 }

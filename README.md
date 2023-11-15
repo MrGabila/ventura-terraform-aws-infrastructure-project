@@ -19,5 +19,14 @@ terraform apply --auto-approve
 - db_subnet_ids
 - security_group_ids
 ### The Infrastructure Module Output variables
-- Frontend LB target group ar
+- bastion_public_ip
+- frontend_lb_dns_name
+- frontend_TG_arn
+- backend_lb_dns_name
+- backend_TG_arn
 ### The Database Module Output variables
+- 
+- 
+- 
+### The Storage Module Output variables
+

@@ -113,6 +113,10 @@ module "sec_groups" {
 }
 
 ###############################  OUTPUT VARIABLES  #################################################
+output "vpc_id" {
+  value = module.vpc.vpc_id
+}
+
 output "nat_lb_subnet_ids" {
   value = [module.vpc.subnet_ids[0], module.vpc.subnet_ids[1]]
 }

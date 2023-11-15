@@ -5,7 +5,7 @@ resource "local_file" "dbinfo" {
 
     define('DB_SERVER', '${var.db_endpoint}');
     define('DB_USERNAME', 'admin');
-    define('DB_PASSWORD', 'admin12345');
+    define('DB_PASSWORD', 'adminadmin');
     define('DB_DATABASE', '${var.initial_database}');
 
     ?>
@@ -28,7 +28,7 @@ resource "local_file" "default-conf" {
 resource "aws_s3_object" "example" {
   bucket = aws_s3_bucket.example.id
   key    = "VenturaMailingApp.php"
-  source = "./VenturaMailingApp.php"
+  content = var.source_code
 }
 
 resource "aws_s3_object" "default-conf" {
@@ -47,5 +47,6 @@ resource "aws_s3_object" "dbinfo" {
 variable "db_endpoint" {}
 variable "initial_database" {}
 variable "backend_lb_dns_name" {}
+variable "source_code" {}
 
 #################### OUTPUT VARIABLES ##########################

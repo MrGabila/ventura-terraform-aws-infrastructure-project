@@ -1,7 +1,7 @@
 #################################  RESOURCES  ######################################################
 resource "aws_security_group" "bastion_sg" {
   name        = "${var.name_prefix}-bastion-SG"
-  description = "Bastion Host Security Group"
+  description = "Terraform ventura prod bastion-host SG"
   vpc_id = var.vpc_id
 
   dynamic "ingress" {
@@ -18,7 +18,7 @@ resource "aws_security_group" "bastion_sg" {
 
 resource "aws_security_group" "frontend_sg" {
   name        = "${var.name_prefix}-frontend-lb-SG"
-  description = "Frontend-LB-Security-Group"
+  description = "Terraform ventura prod frontend SG"
   vpc_id = var.vpc_id
   dynamic "ingress" {
         for_each = var.frontend_lb_ports
@@ -35,7 +35,7 @@ resource "aws_security_group" "frontend_sg" {
 
 resource "aws_security_group" "webservers_sg" {
   name        = "${var.name_prefix}-webservers-SG"
-  description = "Webservers Security Group"
+  description = "Terraform ventura prod Web server SG"
   vpc_id = var.vpc_id
 
   ingress {
@@ -59,6 +59,7 @@ resource "aws_security_group" "webservers_sg" {
 
 resource "aws_security_group" "backend_sg" {
   name        = "${var.name_prefix}-backend-lb-SG"
+  description = "Terraform ventura prod backend SG"
   vpc_id = var.vpc_id
   dynamic "ingress" {
   for_each = var.backend_lb_ports
@@ -74,7 +75,7 @@ resource "aws_security_group" "backend_sg" {
 
 resource "aws_security_group" "appservers_sg" {
   name        = "${var.name_prefix}-appservers-SG"
-  description = "Appservers Security Group"
+  description = "Terraform ventura prod App servers SG"
   vpc_id = var.vpc_id
   ingress {
     from_port        = 22
@@ -97,7 +98,7 @@ resource "aws_security_group" "appservers_sg" {
 
 resource "aws_security_group" "database_sg" {
   name        = "${var.name_prefix}-database-SG"
-  description = "Database-Security-Group"
+  description = "Terraform ventura prod database SG"
   vpc_id = var.vpc_id
   ingress {
     from_port        = var.database_port
