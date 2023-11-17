@@ -42,6 +42,7 @@ resource "aws_security_group" "webservers_sg" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
+    #cidr_blocks = [ "0.0.0.0/0" ]
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
@@ -51,6 +52,7 @@ resource "aws_security_group" "webservers_sg" {
     from_port   = ingress.value
     to_port     = ingress.value
     protocol    = "tcp"
+    #cidr_blocks = [ "0.0.0.0/0" ]
     security_groups = [aws_security_group.frontend_sg.id]
   }
 }
@@ -81,6 +83,7 @@ resource "aws_security_group" "appservers_sg" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
+    #cidr_blocks = [ "0.0.0.0/0" ]
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
@@ -90,6 +93,7 @@ resource "aws_security_group" "appservers_sg" {
     from_port   = ingress.value
     to_port     = ingress.value
     protocol    = "tcp"
+    #cidr_blocks = [ "0.0.0.0/0" ]
     security_groups = [aws_security_group.backend_sg.id]
     }
   }
@@ -132,7 +136,7 @@ variable "bastion_ports" {
 variable "frontend_lb_ports" {
   description = "List of ports that be open to your_connection_ip"
   type        = list
-  default     = [80, 433]
+  default     = [80, 443]
 }
 variable "database_port" {
   description = "Port to connect database to bastion and App servers"
@@ -142,17 +146,17 @@ variable "database_port" {
 variable "webserver_ports" {
   description = "List of ports to connect web servers to frontend_lb, port 22 is open to bastion"
   type        = list
-  default     = [80, 433]
+  default     = [80, 443]
 }
 variable "backend_lb_ports" {
   description = "List of ports to connect backend_lb to Web servers"
   type        = list
-  default     = [80, 433]
+  default     = [80, 443]
 }
 variable "appserver_ports" {
   description = "List of ports to connect App servers to backend_lb, port 22 is open to bastion"
   type        = list
-  default     = [80, 433]
+  default     = [80, 443]
 }
 
 variable "common_egress" {

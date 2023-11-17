@@ -107,8 +107,8 @@ module "sec_groups" {
   bastion_ports     = [22, 3306]
   frontend_lb_ports = [80, 443]
   webserver_ports   = [80, 443]
-  backend_lb_ports  = [80, 433]
-  appserver_ports   = [80, 433]
+  backend_lb_ports  = [80, 443]
+  appserver_ports   = [80, 443]
   database_port     = 3306
 }
 

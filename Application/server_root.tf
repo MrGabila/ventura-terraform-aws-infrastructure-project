@@ -77,6 +77,7 @@ module "webservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [data.terraform_remote_state.infrastructure.outputs.frontend_TG_arn]
+  #user_data            = file("./apache2_install.sh")
   user_data            = file("./web-automation.sh")
 }
 # provision Autoscaling group Instances for the App tier
@@ -93,6 +94,7 @@ module "appservers" {
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [data.terraform_remote_state.infrastructure.outputs.backend_TG_arn]
+  #user_data            = file("./streaming_app.sh")
   user_data            = file("./app-automation.sh")
 }
 ###############################  OUTPUT VARIABLES  #################################################

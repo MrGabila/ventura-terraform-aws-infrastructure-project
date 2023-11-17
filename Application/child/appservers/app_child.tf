@@ -1,4 +1,23 @@
 #################### RESOURCES ##########################
+# resource "aws_launch_template" "example" {
+#   name                 = "${var.name_prefix}-app-LT"
+#   version              = "$Latest"
+
+#   image_id             = var.AMI
+#   instance_type        = var.instance_type
+#   key_name             = var.key_name
+#   security_group_names = [var.sg_id]
+
+#   user_data            = var.user_data
+#   associate_public_ip_address = true
+
+#   iam_instance_profile {
+#     name = var.iam_instance_profile
+#   }
+# #note the usage of security_group_names instead of security_groups, as Launch Templates expect security group names instead of IDs.
+# }
+
+
 # Define Your Launch Configuration for the autoscaling group
 resource "aws_launch_configuration" "template" {
   name_prefix                 = "${var.name_prefix}-app-LC"

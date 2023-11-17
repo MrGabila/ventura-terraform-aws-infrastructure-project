@@ -383,14 +383,15 @@ In this runbook, we will implement the PHP Mailing deployment with multi-tier ar
 2. Login to your `Prod-Appserver` using SSH Port Fowarding and Execute the following ccommands https://github.com/awanmbandi/aws-real-world-projects/blob/four-tier-mailing-app-project/appservers-startup-script/app-automation.sh
 
 ### 1. Setup SSH Port Forwarding Between Your Local and Bastion Host To Point at The Web, App and DB Instance.
-```exec ssh-agent bash``` 
+```
+exec ssh-agent bash
+eval 'ssh-agent -s'
+ssh-agent bash
+ssh-add -L 
+```
 
-``` eval 'ssh-agent -s' ```
-
-```ssh-agent bash```
-
-#### ssh-add -L    
-- (Once you run this command it will tell you if you have added some identities to SSH agen or not. If not run the bellow command to add identity or private key) 
+####    
+- (Once you run this command it will tell you if you have added some identities to SSH agent or not. If not run the below command to add identity or private key) 
 ```ssh-add -k "Absolute Path to your Private key file on your Local"```
 
 ```ssh-add -L```
@@ -399,11 +400,15 @@ Now run the above command to check added identities or Private keys
 - Now we have to use this SSH Agent Identity to login to our bastion in the public subnet then we'll be able to login to our private server 
 
 #### ssh -A -i "private key" USER_NAME@HostNameORipAddress
-```ssh -A -i "private key" USER_NAME@HostNameORipAddress```
+```
+ssh -A -i "private key" USER_NAME@HostNameORipAddress
+```
 - (-A stands for AGENT FORWARDING. And once you get into the instance in the Bastion host using the SSH AGENT Identity, when you try to SSH into the instance in the private subnet now, what SSH AGENT will do is. It will make use of the Identity in your local machine to access the server. Then you'll be authenticated) 
 
 #### ssh USER_NAME@IPAddress
-```ssh USER_NAME@"Private Instance IP Address"```
+```
+ssh USER_NAME@"Private Instance IP Address"
+```
 - (Once you run this command you will be allowed into the server. That is SSH Agent port fording. It makes use of the locally stored Identity). 
 
 ## STEP 10: Create Webservers and Apservers Launch Templates
