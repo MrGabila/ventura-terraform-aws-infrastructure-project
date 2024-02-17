@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "default"
+  profile = "Dzeko"
 
   default_tags {
     tags = {
@@ -102,13 +102,13 @@ module "sec_groups" {
   source             = "./child/sec_groups"
   name_prefix        = var.name_prefix
   vpc_id             = module.vpc.vpc_id
-  your_connection_ip = "0.0.0.0/0"
+  user_access_ip = "0.0.0.0/0"
 
-  bastion_ports     = [22, 3306]
+  bastion_ports     = [22]
   frontend_lb_ports = [80, 443]
-  webserver_ports   = [80, 443]
+  webserver_ports   = [80, 443] #port 22 is already open to bastion
   backend_lb_ports  = [80, 443]
-  appserver_ports   = [80, 443]
+  appserver_ports   = [80, 443] #port 22 is already open to bastion
   database_port     = 3306
 }
 

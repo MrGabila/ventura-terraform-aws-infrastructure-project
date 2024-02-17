@@ -35,7 +35,7 @@ resource "aws_autoscaling_group" "example" {
   name_prefix               = "${var.name_prefix}-app-ASG"
   launch_configuration      = aws_launch_configuration.template.name
   min_size                  = 1
-  max_size                  = 5
+  max_size                  = 3
   desired_capacity          = var.desired_capacity
   vpc_zone_identifier       = var.subnet_ids # app subnets
   health_check_type         = "EC2"

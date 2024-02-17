@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "default"
+  profile = "Dzeko"
 
   default_tags {
     tags = {

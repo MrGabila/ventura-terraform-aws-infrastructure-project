@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "default"
+  profile = "Dzeko"
 
   default_tags {
     tags = {
@@ -38,6 +38,21 @@ data "terraform_remote_state" "infrastructure" {
   }
 }
 
+data "aws_ami" "ubuntu_20" {
+  most_recent = true
+  owners      = ["099720109477"]  # Canonical account ID for Ubuntu AMIs
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 variable "instance_tags" {
   description = "tags to be added to all instances"
   type        = map(any)
@@ -53,9 +68,9 @@ variable "instance_tags" {
   }
 }
 
-variable "nova-key" {
+variable "key-pair" {
   type      = string
-  default   = "Novirginia-region"
+  default   = "dzeko-Virginia-region"
   sensitive = true
 }
 
@@ -71,15 +86,16 @@ module "webservers" {
   sg_id          = data.terraform_remote_state.network.outputs.security_group_ids["webservers"]
 
   name_prefix          = var.name_prefix
-  AMI                  = "ami-0261755bbcb8c4a84"                              # Ubuntu 20.04
-  desired_capacity     = 1                                                    # max = 5
-  key_name             = var.nova-key
+  AMI                  = data.aws_ami.ubuntu_20
+  desired_capacity     = 1                                                    # max = 3
+  key_name             = var.key-pair
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [data.terraform_remote_state.infrastructure.outputs.frontend_TG_arn]
   #user_data            = file("./apache2_install.sh")
   user_data            = file("./web-automation.sh")
 }
+
 # provision Autoscaling group Instances for the App tier
 module "appservers" {
   source     = "./child/appservers"
@@ -90,11 +106,10 @@ module "appservers" {
   name_prefix          = var.name_prefix
   AMI                  = "ami-0bb4c991fa89d4b9b"                              # Amazon Linux 2
   desired_capacity     = 1                                                    # max = 5
-  key_name             = var.nova-key
+  key_name             = var.key-pair
   tags                 = var.instance_tags
   iam_instance_profile = data.aws_iam_instance_profile.profile.name
   target_group_arns    = [data.terraform_remote_state.infrastructure.outputs.backend_TG_arn]
-  #user_data            = file("./streaming_app.sh")
   user_data            = file("./app-automation.sh")
 }
 ###############################  OUTPUT VARIABLES  #################################################

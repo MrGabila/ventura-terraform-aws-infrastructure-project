@@ -10,7 +10,7 @@ resource "aws_security_group" "bastion_sg" {
           from_port   = ingress.value
           to_port     = ingress.value
           protocol    = "tcp"
-          cidr_blocks = [var.your_connection_ip]
+          cidr_blocks = [var.user_access_ip]
       }
     }
   egress = var.common_egress
@@ -26,7 +26,7 @@ resource "aws_security_group" "frontend_sg" {
             from_port   = ingress.value
             to_port     = ingress.value
             protocol    = "tcp"
-            cidr_blocks = [var.your_connection_ip]
+            cidr_blocks = ["0.0.0.0/0"]
             }
   }
   egress = var.common_egress
@@ -123,25 +123,20 @@ resource "aws_security_group" "database_sg" {
 variable "vpc_id" {}
 variable "name_prefix" {}
 
-variable "your_connection_ip" {
+variable "user_access_ip" {
   description = "The IP address you will use to access the Bastion and the Frontend LB"
   type        = string
   default     = "0.0.0.0/0"
 }
 variable "bastion_ports" {
-  description = "List of Bastion ports that be open to your_connection_ip"
+  description = "List of Bastion ports that be open to user_access_ip"
   type        = list
   default     = [22]
 }
 variable "frontend_lb_ports" {
-  description = "List of ports that be open to your_connection_ip"
+  description = "List of LB ports that be open to the internet"
   type        = list
   default     = [80, 443]
-}
-variable "database_port" {
-  description = "Port to connect database to bastion and App servers"
-  type        = number
-  default     = 3306
 }
 variable "webserver_ports" {
   description = "List of ports to connect web servers to frontend_lb, port 22 is open to bastion"
@@ -157,6 +152,11 @@ variable "appserver_ports" {
   description = "List of ports to connect App servers to backend_lb, port 22 is open to bastion"
   type        = list
   default     = [80, 443]
+}
+variable "database_port" {
+  description = "DB port to allow incoming request from App servers"
+  type        = number
+  default     = 3306
 }
 
 variable "common_egress" {
