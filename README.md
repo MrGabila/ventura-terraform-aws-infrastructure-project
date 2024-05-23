@@ -1,5 +1,8 @@
 Ventura PHP Mailing deployment with multi-tier architecture on AWS. It uses Amazon EC2 service for Webservers and Appservers, And RDS service for the Mysql database.
 
+# 👨🏼‍💻 Deploying a 4 Tier Mailing Web Application on AWS 👨🏼‍💻
+![4TierAppArchitecture!](test-files/vetura-prod-architecture.png)
+
 ### Prerequisites:
 * Terraform installed
 * AWS Account and AWS cli installed
